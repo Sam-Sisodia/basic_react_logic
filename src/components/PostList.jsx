@@ -4,30 +4,12 @@ import { PostList as PostListData } from "../strore/posts-list-store";
 import { useContext, useEffect, useState } from "react";
 import WelcomeMessage from "./WelcomeMessage";
 import LoadingSpinner from "./LoadingSpinner";
+import { useLoaderData } from "react-router-dom";
 
 const PostList = () => {
-  const { postList, addIntialsPosts } = useContext(PostListData);
-  const [fetching, setfetchig] = useState(false);
-  // const [dataFetched , setdataFateched] = useState();
+  // const { postList } = useContext(PostListData);
+  const postList = useLoaderData();
 
-  useEffect(() => {
-    setfetchig(true);
-    const controller = new AbortController();
-    const signal = controller.signal
-    fetch("https://dummyjson.com/posts", {signal})
-      .then((res) => res.json())
-      .then((data) => {
-        addIntialsPosts(data.posts);
-        setfetchig(false);
-      });
-
-    return () => {
-      console.log("clen up ");
-      controller.abort();
-
-
-    }
-  }, []);
 
   // if (! dataFetched){
   //     fetch("https://dummyjson.com/posts")
@@ -52,12 +34,28 @@ const PostList = () => {
 
   return (
     <>
-      {fetching && <LoadingSpinner />}
-      {!fetching && postList.length === 0 && <WelcomeMessage />}
+      {/* {<LoadingSpinner />} */}
+      { postList.length === 0 && <WelcomeMessage />}
 
-      {!fetching && postList.map((post) => <Post key={post.id} post={post} />)}
+      {  postList.map((post) => <Post key={post.id} post={post} />)}
     </>
   );
 };
 
+
+
+
+export const PostLoader = () => {
+
+   return fetch("https://dummyjson.com/posts",)
+    .then((res) => res.json())
+    .then((data) => {
+      return data.posts
+      // addIntialsPosts(data.posts);
+      // setfetchig(false);
+    });
+
+}
 export default PostList;
+
+
