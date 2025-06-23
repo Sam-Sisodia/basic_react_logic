@@ -3,41 +3,41 @@ import { useRef } from "react";
 import { PostList } from "../strore/posts-list-store";
 
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { Form, redirect } from "react-router-dom";
 
 const CreatePost = () => {
-  const { addPost } = useContext(PostList);
-  const navigate = useNavigate();
+  // const { addPost } = useContext(PostList);
+  // const navigate = useNavigate();
 
-  const userIdElement = useRef();
-  const postTitleElement = useRef();
-  const postBodyElement = useRef();
-  const reactionsElement = useRef();
-  const tagsElement = useRef();
+  // const userIdElement = useRef();
+  // const postTitleElement = useRef();
+  // const postBodyElement = useRef();
+  // const reactionsElement = useRef();
+  // const tagsElement = useRef();
 
-  const handelSubmit = (event) => {
-    event.preventDefault();
-    const userId = userIdElement.current.value;
-    const postTitle = postTitleElement.current.value;
-    const postBody = postBodyElement.current.value;
-    const reaction = reactionsElement.current.value;
-    const tags = tagsElement.current.value.split(/(\s+)/);
-    addPost(userId,postTitle,postBody,reaction,tags)
-    navigate('/')
+  // const handelSubmit = (event) => {
+  //   event.preventDefault();
+  //   const userId = userIdElement.current.value;
+  //   const postTitle = postTitleElement.current.value;
+  //   const postBody = postBodyElement.current.value;
+  //   const reaction = reactionsElement.current.value;
+  //   const tags = tagsElement.current.value.split(/(\s+)/);
+  //   addPost(userId,postTitle,postBody,reaction,tags)
+  //   navigate('/')
 
 
-  };
+  // };
 
 
   return (  
-    <form className="create-post" onSubmit={handelSubmit}>
+    <Form  method="POST" className="create-post" >
       <div className="mb-3">
         <label htmlFor="userId" className="form-label">
           User ID
         </label>
         <input
           type="text"
-          ref={userIdElement}
+          name="userId"
           className="form-control"
           id="userID"
         />
@@ -49,17 +49,17 @@ const CreatePost = () => {
         </label>
         <input
           type="text"
-          ref={postTitleElement}
+          name="title"
           className="form-control"
           id="title"
         />
       </div>
 
       <div className="mb-3">
-        <label htmlFor="body" ref={postBodyElement} className="form-label">
+        <label htmlFor="body"  className="form-label">
           Post Description
         </label>
-        <input type="text" className="form-control" id="body" />
+        <input type="text" name ="body" className="form-control" id="body" />
       </div>
 
       <div className="mb-3">
@@ -68,7 +68,7 @@ const CreatePost = () => {
         </label>
         <input
           type="text"
-          ref={reactionsElement}
+          name="reaction"
           className="form-control"
           id="reactions"
         />
@@ -80,7 +80,7 @@ const CreatePost = () => {
         </label>
         <input
           type="text"
-          ref={tagsElement}
+          name="tags"
           className="form-control"
           id="tags"
         />
@@ -89,8 +89,31 @@ const CreatePost = () => {
       <button type="submit" className="btn btn-primary">
         Post
       </button>
-    </form>
+    </Form>
   );
 };
 
+
+
+export async  function CreatePOSTAction(data) {
+  const formData=  await data.request.formData();
+  const postData = Object.fromEntries(formData);
+  postData.tags = postData.tags.split("");
+
+  console.log("++++++++++++++++++++++++++++++",postData)
+  
+
+  fetch("https://dummyjson.com/posts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(postData)
+  }).then((res)=>res.json())
+  .then((post)=>{
+    console.log("+++++++++++++++++++++++++",post)
+    // addPost(post);
+
+  })
+
+  return redirect('/');
+};
 export default CreatePost;
